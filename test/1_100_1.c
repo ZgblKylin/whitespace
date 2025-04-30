@@ -1,6 +1,7 @@
 #include "whitespace.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 bool DumpCode(const char *code, const char *file) {
   FILE *fp = fopen(file, "w");
@@ -15,6 +16,7 @@ bool Test_Print_1_100_1() {
 #define S WHITESPACE_S
 #define T WHITESPACE_T
 #define L WHITESPACE_L
+#define WS(x) WHITESPACE_##x
 
 #define VALUE_0 S, S, L                       // S 0 L
 #define VALUE_1 S, T, L                       // S 1 L
@@ -28,38 +30,38 @@ bool Test_Print_1_100_1() {
   // clang-format off
   const char code[] = {
     /* |----------------| */
-    /* | int i = 1;     | */ WHITESPACE_STACK_PUSH, VALUE_1,           // i = 1
-    /* | S: do {        | */ WHITESPACE_FLOW_LABEL_CREATE, LABEL_S,    // Create label 'S'
-    /* |   print(i);    | */ WHITESPACE_STACK_DUP,                     // j = i
-    /* |                | */ WHITESPACE_IO_OUTPUT_NUMBER,              // print j
-    /* |   print('\n'); | */ WHITESPACE_STACK_PUSH, VALUE_LF,          // j = \n
-    /* |                | */ WHITESPACE_IO_OUTPUT_ASCII,               // print j
-    /* |   i++;         | */ WHITESPACE_STACK_PUSH, VALUE_1,           // j = 1
-    /* |                | */ WHITESPACE_ARTH_ADD,                      // i = i + j
-    /* | } (i < 100);   | */ WHITESPACE_STACK_DUP,                     // j = i
-    /* |                | */ WHITESPACE_STACK_PUSH, VALUE_100,         // k = 100
-    /* |                | */ WHITESPACE_ARTH_SUB,                      // j = j - k
-    /* |                | */ WHITESPACE_FLOW_LABEL_JUMP_NEG, LABEL_S,  // goto 'S' if j < 0
+    /* | int i = 1;     | */ WS(STACK_PUSH),          VALUE_1,    // i = 1
+    /* | S: do {        | */ WS(FLOW_LABEL_CREATE),   LABEL_S,    // Create label 'S'
+    /* |   print(i);    | */ WS(STACK_DUP),                       // j = i
+    /* |                | */ WS(IO_OUTPUT_NUMBER),                // print j
+    /* |   print('\n'); | */ WS(STACK_PUSH),          VALUE_LF,   // j = \n
+    /* |                | */ WS(IO_OUTPUT_ASCII),                 // print j
+    /* |   i++;         | */ WS(STACK_PUSH),          VALUE_1,    // j = 1
+    /* |                | */ WS(ARTH_ADD),                        // i = i + j
+    /* | } (i < 100);   | */ WS(STACK_DUP),                       // j = i
+    /* |                | */ WS(STACK_PUSH),          VALUE_100,  // k = 100
+    /* |                | */ WS(ARTH_SUB),                        // j = j - k
+    /* |                | */ WS(FLOW_LABEL_JUMP_NEG), LABEL_S,    // goto 'S' if j < 0
     /* |----------------| */
 
     /* |----------------| */
     /* | int i = 100;   | */ // i already is 100
-    /* | T: do {        | */ WHITESPACE_FLOW_LABEL_CREATE, LABEL_T,    // Create label 'T'
-    /* |   print(i);    | */ WHITESPACE_STACK_DUP,                     // j = i
-    /* |                | */ WHITESPACE_IO_OUTPUT_NUMBER,              // print j
-    /* |   print('\n'); | */ WHITESPACE_STACK_PUSH, VALUE_LF,          // j = \n
-    /* |                | */ WHITESPACE_IO_OUTPUT_ASCII,               // print j
-    /* |   i--;         | */ WHITESPACE_STACK_PUSH, VALUE_1,           // j = 1
-    /* |                | */ WHITESPACE_ARTH_SUB,                      // i = i - j
-    /* | } (i >= 1);    | */ WHITESPACE_STACK_DUP,                     // j = i
-    /* |                | */ WHITESPACE_STACK_PUSH, VALUE_0,           // k = 0
-    /* |                | */ WHITESPACE_STACK_SWAP,                    // swap(j, k)
-    /* |                | */ WHITESPACE_ARTH_SUB,                      // j = k - j
-    /* |                | */ WHITESPACE_FLOW_LABEL_JUMP_NEG, LABEL_T,  // goto 'T' if j < 0
+    /* | T: do {        | */ WS(FLOW_LABEL_CREATE),   LABEL_T,  // Create label 'T'
+    /* |   print(i);    | */ WS(STACK_DUP),                     // j = i
+    /* |                | */ WS(IO_OUTPUT_NUMBER),              // print j
+    /* |   print('\n'); | */ WS(STACK_PUSH),          VALUE_LF, // j = \n
+    /* |                | */ WS(IO_OUTPUT_ASCII),               // print j
+    /* |   i--;         | */ WS(STACK_PUSH),          VALUE_1,  // j = 1
+    /* |                | */ WS(ARTH_SUB),                      // i = i - j
+    /* | } (i >= 1);    | */ WS(STACK_DUP),                     // j = i
+    /* |                | */ WS(STACK_PUSH),          VALUE_0,  // k = 0
+    /* |                | */ WS(STACK_SWAP),                    // swap(j, k)
+    /* |                | */ WS(ARTH_SUB),                      // j = k - j
+    /* |                | */ WS(FLOW_LABEL_JUMP_NEG), LABEL_T,  // goto 'T' if j < 0
     /* |----------------| */
 
     // end of program
-    WHITESPACE_FLOW_EXIT,
+    WS(FLOW_EXIT),
 
     '\0'
   };
