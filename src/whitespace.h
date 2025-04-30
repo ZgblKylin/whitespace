@@ -5,19 +5,19 @@
 
 #include <stdbool.h>
 
-#ifndef _CRT_SECURE_NO_WARNINGS // fopen_s
+#ifndef _CRT_SECURE_NO_WARNINGS  // fopen_s
 #define _CRT_SECURE_NO_WARNINGS
-#endif // _CRT_SECURE_NO_WARNINGS
+#endif  // _CRT_SECURE_NO_WARNINGS
 
 #ifdef WHITESPACE_DEBUG
 #define WHITESPACE_S 'S'
 #define WHITESPACE_T 'T'
 #define WHITESPACE_L 'L'
-#else // not WHITESPACE_DEBUG
+#else  // not WHITESPACE_DEBUG
 #define WHITESPACE_S ' '
 #define WHITESPACE_T '\t'
 #define WHITESPACE_L '\n'
-#endif // not WHITESPACE_DEBUG
+#endif  // not WHITESPACE_DEBUG
 
 // clang-format off
 #define WHITESPACE_IO_READ_ASCII            WHITESPACE_T, WHITESPACE_L,   WHITESPACE_T, WHITESPACE_S
@@ -48,4 +48,4 @@
 
 bool WhiteSpace_Intepret(const char *code, size_t length);
 
-#endif // WHITESPACE_H
+#endif  // WHITESPACE_H

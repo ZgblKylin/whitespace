@@ -17,10 +17,10 @@ bool Test_Print_1_100_1() {
 #define L WHITESPACE_L
 #define WS(x) WHITESPACE_##x
 
-#define VALUE_0 S, S, L                       // S 0 L
-#define VALUE_1 S, T, L                       // S 1 L
-#define VALUE_LF S, S, S, S, S, T, S, T, S, L // S 00001010 L
-#define VALUE_100 S, T, T, S, S, T, S, S, L   // S 1100100 L
+#define VALUE_0 S, S, L                        // S 0 L
+#define VALUE_1 S, T, L                        // S 1 L
+#define VALUE_LF S, S, S, S, S, T, S, T, S, L  // S 00001010 L
+#define VALUE_100 S, T, T, S, S, T, S, S, L    // S 1100100 L
 
 #define LABEL_S S, L
 #define LABEL_T T, L

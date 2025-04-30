@@ -45,9 +45,9 @@
 
 #define UNUSED(x) (void)x
 
-#define CHECK(x)                                                               \
-  if (!x) {                                                                    \
-    return false;                                                              \
+#define CHECK(x)  \
+  if (!x) {       \
+    return false; \
   }
 
 typedef struct Stack {
@@ -61,7 +61,7 @@ void StackRelease(struct Stack *stack) {
   if (stack->stack) {
     free(stack->stack);
   }
-#endif // not STATIC_STACK
+#endif  // not STATIC_STACK
 }
 
 int StackPos(struct Stack *stack) { return stack->depth - 1; }
@@ -71,7 +71,7 @@ bool StackGrow(struct Stack *stack) {
   if (stack->depth >= stack->size) {
     return false;
   }
-#else  // not STATIC_STACK
+#else   // not STATIC_STACK
   if (!stack->stack) {
     stack->size = 1024;
     stack->stack = (int *)malloc(sizeof(int) * stack->size);
@@ -79,7 +79,7 @@ bool StackGrow(struct Stack *stack) {
     stack->size *= 2;
     stack->stack = (int *)realloc(stack->stack, sizeof(int) * stack->size);
   }
-#endif // not STATIC_STACK
+#endif  // not STATIC_STACK
   stack->depth += 1;
   return true;
 }
@@ -156,7 +156,7 @@ typedef struct Context {
   int _call_stack[CALL_STACK_SIZE];
   struct Label _labels[LABEL_SIZE];
   struct Heap _heaps[HEAP_SIZE];
-#endif // STATIC_STACK
+#endif  // STATIC_STACK
 } Context;
 
 void ContextInitialize(struct Context *ctx, const char *code, size_t length) {
@@ -168,7 +168,7 @@ void ContextInitialize(struct Context *ctx, const char *code, size_t length) {
   ctx->data_stack.size = DATA_STACK_SIZE;
   ctx->call_stack.stack = ctx->_call_stack;
   ctx->call_stack.size = CALL_STACK_SIZE;
-#endif // not STATIC_STACK
+#endif  // not STATIC_STACK
 }
 
 struct Label *LabelCreate(struct Context *ctx, const char *label,
@@ -187,10 +187,10 @@ struct Label *LabelCreate(struct Context *ctx, const char *label,
   if (!ret) {
     return NULL;
   }
-#else  // not STATIC_STACK
+#else   // not STATIC_STACK
   ret = (struct Label *)malloc(sizeof(struct Label));
   memset(ret, 0, sizeof(struct Label));
-#endif // not STATIC_STACK
+#endif  // not STATIC_STACK
 
   ret->label = label;
   ret->label_length = label_length;
@@ -216,9 +216,9 @@ struct Label *LabelRelease(struct Context *ctx, struct Label *label) {
 
 #ifdef STATIC_STACK
   memset(label, 0, sizeof(struct Label));
-#else  // not STATIC_STACK
+#else   // not STATIC_STACK
   free(label);
-#endif // not STATIC_STACK
+#endif  // not STATIC_STACK
 
   return ret;
 }
@@ -253,10 +253,10 @@ struct Heap *HeapCreate(struct Context *ctx, int addr) {
   if (!heap) {
     return NULL;
   }
-#else  // not STATIC_STACK
+#else   // not STATIC_STACK
   heap = (struct Heap *)malloc(sizeof(struct Heap));
   memset(heap, 0, sizeof(struct Heap));
-#endif // not STATIC_STACK
+#endif  // not STATIC_STACK
 
   heap->addr = addr;
   heap->next = ctx->heaps;
@@ -291,9 +291,9 @@ struct Heap *HeapRelease(struct Context *ctx, struct Heap *heap) {
 
 #ifdef STATIC_STACK
   memset(heap, 0, sizeof(struct Heap));
-#else  // not STATIC_STACK
+#else   // not STATIC_STACK
   free(heap);
-#endif // STATIC_STACK
+#endif  // STATIC_STACK
 
   return ret;
 }
@@ -314,12 +314,12 @@ char CodeAdvance(struct Context *ctx) {
   while (ctx->pc < ctx->code_length) {
     ch = ctx->code[ctx->pc++];
     switch (ch) {
-    case S:
-    case T:
-    case L:
-      return ch;
-    default:
-      continue;
+      case S:
+      case T:
+      case L:
+        return ch;
+      default:
+        continue;
     }
   }
   return '\0';
@@ -337,37 +337,37 @@ typedef enum IMP {
 } IMP;
 bool ParseIMP(struct Context *ctx, enum IMP *imp) {
   switch (CodeAdvance(ctx)) {
-  case S:
-    *imp = IMP_STACK;
-    return true;
-
-  case T:
-    switch (CodeAdvance(ctx)) {
     case S:
-      *imp = IMP_ARITHMETIC;
+      *imp = IMP_STACK;
       return true;
+
     case T:
-      *imp = IMP_HEAP;
-      return true;
+      switch (CodeAdvance(ctx)) {
+        case S:
+          *imp = IMP_ARITHMETIC;
+          return true;
+        case T:
+          *imp = IMP_HEAP;
+          return true;
+        case L:
+          *imp = IMP_IO;
+          return true;
+
+        default:
+          return false;
+      }
+      break;
+
     case L:
-      *imp = IMP_IO;
+      *imp = IMP_FLOW;
+      return true;
+
+    case '\0':
+      *imp = IMP_NONE;
       return true;
 
     default:
       return false;
-    }
-    break;
-
-  case L:
-    *imp = IMP_FLOW;
-    return true;
-
-  case '\0':
-    *imp = IMP_NONE;
-    return true;
-
-  default:
-    return false;
   }
   return false;
 }
@@ -375,32 +375,32 @@ bool ParseIMP(struct Context *ctx, enum IMP *imp) {
 bool ReadNumber(struct Context *ctx, int *number) {
   bool positive;
   switch (CodeAdvance(ctx)) {
-  case S:
-    positive = true;
-    break;
-  case T:
-    positive = false;
-    break;
-  default:
-    return false;
+    case S:
+      positive = true;
+      break;
+    case T:
+      positive = false;
+      break;
+    default:
+      return false;
   }
 
   int num = 0;
   while (true) {
     switch (CodeAdvance(ctx)) {
-    case S:
-      num = num << 1;
-      break;
-    case T:
-      num = num << 1;
-      num = num | 0x1;
-      break;
-    case L:
-      *number = positive ? num : -num;
-      return true;
-      break;
-    default:
-      return false;
+      case S:
+        num = num << 1;
+        break;
+      case T:
+        num = num << 1;
+        num = num | 0x1;
+        break;
+      case L:
+        *number = positive ? num : -num;
+        return true;
+        break;
+      default:
+        return false;
     }
   }
 
@@ -543,14 +543,14 @@ bool ReadLabel(struct Context *ctx, const char **label, size_t *label_length) {
   *label_length = 0;
   while (true) {
     switch (CodeAdvance(ctx)) {
-    case S:
-    case T:
-      *label_length += 1;
-      break;
-    case L:
-      return true;
-    default:
-      return false;
+      case S:
+      case T:
+        *label_length += 1;
+        break;
+      case L:
+        return true;
+      default:
+        return false;
     }
   }
   return false;
@@ -660,180 +660,180 @@ bool IntepretImpl(struct Context *ctx) {
     }
 
     switch (imp) {
-    case IMP_IO: {
-      switch (CodeAdvance(ctx)) {
-      case T: {
+      case IMP_IO: {
         switch (CodeAdvance(ctx)) {
-        case S:
-          CHECK(CommandIOReadAscii(ctx));
-          break;
-        case T:
-          CHECK(CommandIOReadNumber(ctx));
-          break;
-        default:
-          return false;
+          case T: {
+            switch (CodeAdvance(ctx)) {
+              case S:
+                CHECK(CommandIOReadAscii(ctx));
+                break;
+              case T:
+                CHECK(CommandIOReadNumber(ctx));
+                break;
+              default:
+                return false;
+            }
+          } break;
+
+          case S: {
+            switch (CodeAdvance(ctx)) {
+              case S:
+                CHECK(CommandIOOutputAscii(ctx));
+                break;
+              case T:
+                CHECK(CommandIOOutputNumber(ctx));
+                break;
+              default:
+                return false;
+            }
+          } break;
+
+          default:
+            return false;
         }
       } break;
 
-      case S: {
+      case IMP_STACK: {
         switch (CodeAdvance(ctx)) {
-        case S:
-          CHECK(CommandIOOutputAscii(ctx));
-          break;
-        case T:
-          CHECK(CommandIOOutputNumber(ctx));
-          break;
-        default:
-          return false;
+          case S: {
+            CHECK(CommandStackPush(ctx));
+          } break;
+
+          case L: {
+            switch (CodeAdvance(ctx)) {
+              case S:
+                CHECK(CommandStackDuplicate(ctx));
+                break;
+              case T:
+                CHECK(CommandStackSwap(ctx));
+                break;
+              case L:
+                CHECK(CommandStackDiscard(ctx));
+                break;
+              default:
+                return false;
+            }
+          } break;
+
+          case T: {
+            switch (CodeAdvance(ctx)) {
+              case S:
+                CHECK(CommandStackCopyNth(ctx));
+                break;
+              case L:
+                CHECK(CommandStackSlideN(ctx));
+                break;
+              default:
+                return false;
+            }
+          } break;
+
+          default:
+            return false;
+        }
+      } break;
+
+      case IMP_ARITHMETIC: {
+        switch (CodeAdvance(ctx)) {
+          case S: {
+            switch (CodeAdvance(ctx)) {
+              case S:
+                CHECK(CommandArithmeticAddition(ctx));
+                break;
+              case T:
+                CHECK(CommandArithmeticSubtraction(ctx));
+                break;
+              case L:
+                CHECK(CommandArithmeticMultiplication(ctx));
+                break;
+              default:
+                return false;
+            }
+          } break;
+
+          case T: {
+            switch (CodeAdvance(ctx)) {
+              case S:
+                CHECK(CommandArithmeticDivision(ctx));
+                break;
+              case T:
+                CHECK(CommandArithmeticModulo(ctx));
+                break;
+              default:
+                return false;
+            }
+          } break;
+
+          default:
+            return false;
+        }
+      } break;
+
+      case IMP_FLOW: {
+        switch (CodeAdvance(ctx)) {
+          case S: {
+            switch (CodeAdvance(ctx)) {
+              case S:
+                CHECK(CommandFlowLabelCreate(ctx));
+                break;
+              case T:
+                CHECK(CommandFlowSubroutineCall(ctx));
+                break;
+              case L:
+                CHECK(CommandFlowLabelJump(ctx));
+                break;
+              default:
+                return false;
+            }
+          } break;
+
+          case T: {
+            switch (CodeAdvance(ctx)) {
+              case S:
+                CHECK(CommandFlowLabelJumpIf0(ctx));
+                break;
+              case T:
+                CHECK(CommandFlowLabelJumpIfNeg(ctx));
+                break;
+              case L:
+                CHECK(CommandFlowSubroutineReturn(ctx));
+                break;
+              default:
+                return false;
+            }
+          } break;
+
+          case L: {
+            switch (CodeAdvance(ctx)) {
+              case L:
+                CHECK(CommandFlowEndProgram(ctx));
+                return true;
+
+              default:
+                return false;
+            }
+          } break;
+
+          default:
+            return false;
+        }
+      } break;
+
+      case IMP_HEAP: {
+        switch (CodeAdvance(ctx)) {
+          case S:
+            CHECK(CommandHeapStore(ctx));
+            break;
+          case T:
+            CHECK(CommandHeapLoad(ctx));
+            break;
+          default:
+            return false;
         }
       } break;
 
       default:
         return false;
-      }
-    } break;
-
-    case IMP_STACK: {
-      switch (CodeAdvance(ctx)) {
-      case S: {
-        CHECK(CommandStackPush(ctx));
-      } break;
-
-      case L: {
-        switch (CodeAdvance(ctx)) {
-        case S:
-          CHECK(CommandStackDuplicate(ctx));
-          break;
-        case T:
-          CHECK(CommandStackSwap(ctx));
-          break;
-        case L:
-          CHECK(CommandStackDiscard(ctx));
-          break;
-        default:
-          return false;
-        }
-      } break;
-
-      case T: {
-        switch (CodeAdvance(ctx)) {
-        case S:
-          CHECK(CommandStackCopyNth(ctx));
-          break;
-        case L:
-          CHECK(CommandStackSlideN(ctx));
-          break;
-        default:
-          return false;
-        }
-      } break;
-
-      default:
-        return false;
-      }
-    } break;
-
-    case IMP_ARITHMETIC: {
-      switch (CodeAdvance(ctx)) {
-      case S: {
-        switch (CodeAdvance(ctx)) {
-        case S:
-          CHECK(CommandArithmeticAddition(ctx));
-          break;
-        case T:
-          CHECK(CommandArithmeticSubtraction(ctx));
-          break;
-        case L:
-          CHECK(CommandArithmeticMultiplication(ctx));
-          break;
-        default:
-          return false;
-        }
-      } break;
-
-      case T: {
-        switch (CodeAdvance(ctx)) {
-        case S:
-          CHECK(CommandArithmeticDivision(ctx));
-          break;
-        case T:
-          CHECK(CommandArithmeticModulo(ctx));
-          break;
-        default:
-          return false;
-        }
-      } break;
-
-      default:
-        return false;
-      }
-    } break;
-
-    case IMP_FLOW: {
-      switch (CodeAdvance(ctx)) {
-      case S: {
-        switch (CodeAdvance(ctx)) {
-        case S:
-          CHECK(CommandFlowLabelCreate(ctx));
-          break;
-        case T:
-          CHECK(CommandFlowSubroutineCall(ctx));
-          break;
-        case L:
-          CHECK(CommandFlowLabelJump(ctx));
-          break;
-        default:
-          return false;
-        }
-      } break;
-
-      case T: {
-        switch (CodeAdvance(ctx)) {
-        case S:
-          CHECK(CommandFlowLabelJumpIf0(ctx));
-          break;
-        case T:
-          CHECK(CommandFlowLabelJumpIfNeg(ctx));
-          break;
-        case L:
-          CHECK(CommandFlowSubroutineReturn(ctx));
-          break;
-        default:
-          return false;
-        }
-      } break;
-
-      case L: {
-        switch (CodeAdvance(ctx)) {
-        case L:
-          CHECK(CommandFlowEndProgram(ctx));
-          return true;
-
-        default:
-          return false;
-        }
-      } break;
-
-      default:
-        return false;
-      }
-    } break;
-
-    case IMP_HEAP: {
-      switch (CodeAdvance(ctx)) {
-      case S:
-        CHECK(CommandHeapStore(ctx));
-        break;
-      case T:
-        CHECK(CommandHeapLoad(ctx));
-        break;
-      default:
-        return false;
-      }
-    } break;
-
-    default:
-      return false;
     }
   }
   return true;
