@@ -145,6 +145,7 @@ typedef struct Heap {
 
 typedef struct Context {
   const char *code;
+  size_t code_length;
   size_t pc;
   struct Stack data_stack;
   struct Stack call_stack;
@@ -158,9 +159,10 @@ typedef struct Context {
 #endif // STATIC_STACK
 } Context;
 
-void ContextInitialize(struct Context *ctx, const char *code) {
+void ContextInitialize(struct Context *ctx, const char *code, size_t length) {
   memset(ctx, 0, sizeof(struct Context));
   ctx->code = code;
+  ctx->code_length = length;
 #ifdef STATIC_STACK
   ctx->data_stack.stack = ctx->_data_stack;
   ctx->data_stack.size = DATA_STACK_SIZE;
@@ -307,7 +309,21 @@ void ContextRelease(struct Context *ctx) {
   }
 }
 
-char CodeAdvance(struct Context *ctx) { return ctx->code[ctx->pc++]; }
+char CodeAdvance(struct Context *ctx) {
+  char ch;
+  while (ctx->pc < ctx->code_length) {
+    ch = ctx->code[ctx->pc++];
+    switch (ch) {
+    case S:
+    case T:
+    case L:
+      return ch;
+    default:
+      continue;
+    }
+  }
+  return '\0';
+}
 
 void CodePutBack(struct Context *ctx) { ctx->pc -= 1; }
 
@@ -817,15 +833,15 @@ bool IntepretImpl(struct Context *ctx) {
     } break;
 
     default:
-      break;
+      return false;
     }
   }
   return true;
 }
 
-bool WhiteSpace_Intepret(const char *code) {
+bool WhiteSpace_Intepret(const char *code, size_t length) {
   Context ctx;
-  ContextInitialize(&ctx, code);
+  ContextInitialize(&ctx, code, length);
   bool ret = IntepretImpl(&ctx);
   ContextRelease(&ctx);
   return ret;

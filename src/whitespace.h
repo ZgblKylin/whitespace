@@ -46,6 +46,6 @@
 #define WHITESPACE_HEAP_LOAD                WHITESPACE_T, WHITESPACE_T,   WHITESPACE_T
 // clang-format on
 
-bool WhiteSpace_Intepret(const char *code);
+bool WhiteSpace_Intepret(const char *code, size_t length);
 
 #endif // WHITESPACE_H

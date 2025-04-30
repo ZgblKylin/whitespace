@@ -3,9 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-bool DumpCode(const char *code, const char *file) {
+bool DumpCode(const char *file, const char *code, size_t length) {
   FILE *fp = fopen(file, "w");
-  size_t length = strlen(code);
   size_t written = fwrite(code, sizeof(char), length, fp);
   fflush(fp);
   fclose(fp);
@@ -67,9 +66,9 @@ bool Test_Print_1_100_1() {
   };
   // clang-format on
 
-  DumpCode(code, "1_100_1.ws");
+  DumpCode("1_100_1.ws", code, sizeof(code) - 1);
 
-  return WhiteSpace_Intepret(code);
+  return WhiteSpace_Intepret(code, sizeof(code) - 1);
 }
 
 int main() { return Test_Print_1_100_1() ? EXIT_SUCCESS : EXIT_FAILURE; }
