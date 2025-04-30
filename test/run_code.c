@@ -23,5 +23,7 @@ const char *LoadCode(const char *file) {
 
 int main(int argc, char *argv[]) {
   const char *code = LoadCode((argc > 1) ? argv[1] : "1_100_1.ws");
-  return WhiteSpace_Intepret(code);
+  bool ret = WhiteSpace_Intepret(code);
+  free(code);
+  return ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }
