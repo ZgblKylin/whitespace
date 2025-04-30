@@ -25,6 +25,6 @@ int main(int argc, char *argv[]) {
   size_t length;
   const char *code = LoadCode((argc > 1) ? argv[1] : "1_100_1.ws", &length);
   bool ret = WhiteSpace_Intepret(code, length);
-  free(code);
+  free((void *)code);
   return ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }
