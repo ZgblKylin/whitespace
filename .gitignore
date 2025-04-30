@@ -1,3 +1,10 @@
+# workspace folders
+.vscode
+build/
+
+# generate files
+bin/
+
 # Prerequisites
 *.d
 
