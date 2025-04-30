@@ -5,10 +5,6 @@
 
 #include <stdbool.h>
 
-#ifndef _CRT_SECURE_NO_WARNINGS  // fopen_s
-#define _CRT_SECURE_NO_WARNINGS
-#endif  // _CRT_SECURE_NO_WARNINGS
-
 #ifdef WHITESPACE_DEBUG
 #define WHITESPACE_S 'S'
 #define WHITESPACE_T 'T'
