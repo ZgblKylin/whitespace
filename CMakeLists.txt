@@ -20,8 +20,8 @@ else()
 endif()
 target_compile_definitions(whitespace PUBLIC -D_CRT_SECURE_NO_WARNINGS)
 
-add_executable(1_100_1 test/1_100_1.c)
+add_executable(1_100_1 example/1_100_1.c)
 target_link_libraries(1_100_1 PUBLIC whitespace)
 
-add_executable(run_code test/run_code.c)
+add_executable(run_code example/run_code.c)
 target_link_libraries(run_code PUBLIC whitespace)
