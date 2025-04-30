@@ -37,10 +37,10 @@ bool Test_Print_1_100_1() {
     /* |   print('\n'); | */ WS(STACK_PUSH),          VALUE_LF,   // j = \n
     /* |                | */ WS(IO_OUTPUT_ASCII),                 // print j
     /* |   i++;         | */ WS(STACK_PUSH),          VALUE_1,    // j = 1
-    /* |                | */ WS(ARTH_ADD),                        // i = i + j
+    /* |                | */ WS(ARITH_ADD),                       // i = i + j
     /* | } (i < 100);   | */ WS(STACK_DUP),                       // j = i
     /* |                | */ WS(STACK_PUSH),          VALUE_100,  // k = 100
-    /* |                | */ WS(ARTH_SUB),                        // j = j - k
+    /* |                | */ WS(ARITH_SUB),                       // j = j - k
     /* |                | */ WS(FLOW_LABEL_JUMP_NEG), LABEL_S,    // goto 'S' if j < 0
     /* |----------------| */
 
@@ -52,11 +52,11 @@ bool Test_Print_1_100_1() {
     /* |   print('\n'); | */ WS(STACK_PUSH),          VALUE_LF, // j = \n
     /* |                | */ WS(IO_OUTPUT_ASCII),               // print j
     /* |   i--;         | */ WS(STACK_PUSH),          VALUE_1,  // j = 1
-    /* |                | */ WS(ARTH_SUB),                      // i = i - j
+    /* |                | */ WS(ARITH_SUB),                     // i = i - j
     /* | } (i >= 1);    | */ WS(STACK_DUP),                     // j = i
     /* |                | */ WS(STACK_PUSH),          VALUE_0,  // k = 0
     /* |                | */ WS(STACK_SWAP),                    // swap(j, k)
-    /* |                | */ WS(ARTH_SUB),                      // j = k - j
+    /* |                | */ WS(ARITH_SUB),                     // j = k - j
     /* |                | */ WS(FLOW_LABEL_JUMP_NEG), LABEL_T,  // goto 'T' if j < 0
     /* |----------------| */
 
