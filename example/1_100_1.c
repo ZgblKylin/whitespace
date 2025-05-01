@@ -28,35 +28,35 @@ bool Test_Print_1_100_1() {
   // clang-format off
   const char code[] = {
     /* |-------------------| */
-    /* | int i = 1;        | */ WS(STACK_PUSH),          VALUE_1,    // i = 1
-    /* | S: do {           | */ WS(FLOW_LABEL_CREATE),   LABEL_S,    // Create label 'S'
-    /* |   print(i);       | */ WS(STACK_DUP),                       // j = i
-    /* |                   | */ WS(IO_OUTPUT_NUMBER),                // print j
-    /* |   print('\n');    | */ WS(STACK_PUSH),          VALUE_LF,   // j = \n
-    /* |                   | */ WS(IO_OUTPUT_ASCII),                 // print j
-    /* |   i++;            | */ WS(STACK_PUSH),          VALUE_1,    // j = 1
-    /* |                   | */ WS(ARITH_ADD),                       // i = i + j
-    /* | } while(i < 100); | */ WS(STACK_DUP),                       // j = i
-    /* |                   | */ WS(STACK_PUSH),          VALUE_100,  // k = 100
-    /* |                   | */ WS(ARITH_SUB),                       // j = j - k
-    /* |                   | */ WS(FLOW_LABEL_JUMP_NEG), LABEL_S,    // goto 'S' if j < 0
+    /* | int i = 1;        | */ WS(STACK_PUSH),          VALUE_1,   // i = 1
+    /* | S: do {           | */ WS(FLOW_LABEL_CREATE),   LABEL_S,   // Create label 'S'
+    /* |   print(i);       | */ WS(STACK_DUP),                      // j = i
+    /* |                   | */ WS(IO_OUTPUT_NUMBER),               // print j
+    /* |   print('\n');    | */ WS(STACK_PUSH),          VALUE_LF,  // j = \n
+    /* |                   | */ WS(IO_OUTPUT_ASCII),                // print j
+    /* |   i++;            | */ WS(STACK_PUSH),          VALUE_1,   // j = 1
+    /* |                   | */ WS(ARITH_ADD),                      // i = i + j
+    /* | } while(i < 100); | */ WS(STACK_DUP),                      // j = i
+    /* |                   | */ WS(STACK_PUSH),          VALUE_100, // k = 100
+    /* |                   | */ WS(ARITH_SUB),                      // j = j - k
+    /* |                   | */ WS(FLOW_LABEL_JUMP_NEG), LABEL_S,   // goto 'S' if j < 0
     /* |-------------------| */
 
-    /* |------------------| */
-    /* | int i = 100;     | */ // i already is 100
-    /* | T: do {          | */ WS(FLOW_LABEL_CREATE),   LABEL_T,  // Create label 'T'
-    /* |   print(i);      | */ WS(STACK_DUP),                     // j = i
-    /* |                  | */ WS(IO_OUTPUT_NUMBER),              // print j
-    /* |   print('\n');   | */ WS(STACK_PUSH),          VALUE_LF, // j = \n
-    /* |                  | */ WS(IO_OUTPUT_ASCII),               // print j
-    /* |   i--;           | */ WS(STACK_PUSH),          VALUE_1,  // j = 1
-    /* |                  | */ WS(ARITH_SUB),                     // i = i - j
-    /* | } while(i >= 1); | */ WS(STACK_DUP),                     // j = i
-    /* |                  | */ WS(STACK_PUSH),          VALUE_0,  // k = 0
-    /* |                  | */ WS(STACK_SWAP),                    // swap(j, k)
-    /* |                  | */ WS(ARITH_SUB),                     // j = k - j
-    /* |                  | */ WS(FLOW_LABEL_JUMP_NEG), LABEL_T,  // goto 'T' if j < 0
-    /* |------------------| */
+    /* |-----------------| */
+    /* | int i = 100;    | */ // i already is 100
+    /* | T: do {         | */ WS(FLOW_LABEL_CREATE),   LABEL_T,  // Create label 'T'
+    /* |   print(i);     | */ WS(STACK_DUP),                     // j = i
+    /* |                 | */ WS(IO_OUTPUT_NUMBER),              // print j
+    /* |   print('\n');  | */ WS(STACK_PUSH),          VALUE_LF, // j = \n
+    /* |                 | */ WS(IO_OUTPUT_ASCII),               // print j
+    /* |   i--;          | */ WS(STACK_PUSH),          VALUE_1,  // j = 1
+    /* |                 | */ WS(ARITH_SUB),                     // i = i - j
+    /* | } while(i > 0); | */ WS(STACK_DUP),                     // j = i
+    /* |                 | */ WS(STACK_PUSH),          VALUE_0,  // k = 0
+    /* |                 | */ WS(STACK_SWAP),                    // swap(j, k)
+    /* |                 | */ WS(ARITH_SUB),                     // j = k - j
+    /* |                 | */ WS(FLOW_LABEL_JUMP_NEG), LABEL_T,  // goto 'T' if j < 0
+    /* |-----------------| */
 
     // end of program
     WS(FLOW_EXIT),
